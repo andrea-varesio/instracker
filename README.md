@@ -9,7 +9,7 @@ It's a tool that fetches "following" and "followers" and then finds ~and keeps t
 ## How to use it
 Launch `export.py` (ie. `python3 export.py`), then login with your credentials and type the username of the account for which you want to find / ~track~ (soon&trade;) unfollowers.
 
-The script will generate an `export_***` folder that contains the raw and cleaned lists as well as `not_following_back.txt`.
+The script will generate an `Export_***` folder that contains the raw and cleaned lists as well as `not_following_back.txt`.
 
 ## Limits
 This script fetches up to 10000 followers (and up to 10000 following), 250 at a time with a random delay between each request. These limits can be edited and the delay can be removed, but beware that, as indicated [upstream](https://github.com/realsirjoe/instagram-scraper), too many requests within a short period of time will result in a 429 error.
