@@ -4,7 +4,7 @@
 It's a tool that fetches "following" and "followers" and then finds ~and keeps track of~ (soon&trade;) the usernames of the accounts that are not following you back.
 
 ## Requirements
-`pip install igramscraper`
+`pip install -r requirements.txt`
 
 ## How to use it
 Launch `export.py` (ie. `python3 export.py`), then login with your credentials and type the username of the account for which you want to find / ~track~ (soon&trade;) unfollowers.
