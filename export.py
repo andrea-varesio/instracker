@@ -12,7 +12,6 @@ print('**************************************************\n\n')
 import argparse
 import getpass
 import os
-import subprocess
 import sys
 from datetime import datetime
 from igramscraper.instagram import Instagram
@@ -30,6 +29,17 @@ def parser():
     parser.add_argument('-q', '--quiet', help='Disable the majority of prompts and verbosity', action='store_true')
     parser.add_argument('--save-cookie', help='Save a session cookie', action='store_true')
     return parser.parse_args()
+
+def splitter(file_input, file_output, query):
+    with open(file_input, 'r') as file:
+        for line in file:
+            if query in line:
+                f = open(file_output, 'a')
+                f.write(line.split(query)[1])
+                f.close()
+
+def join_path(file):
+    return os.path.join(export_dir, file)
 
 args = parser()
 instagram = Instagram()
@@ -70,8 +80,8 @@ if args.save_cookie == False:
     Instagram.instance_cache.empty_saved_cookies()
 
 now = datetime.now()
-exportDir = (target + now.strftime('_%Y%m%d%H%M%S'))
-os.mkdir(exportDir)
+export_dir = (target + now.strftime('_%Y%m%d%H%M%S'))
+os.mkdir(export_dir)
 
 sleep(2)
 
@@ -83,11 +93,12 @@ followers = []
 sleep(1)
 followers = instagram.get_followers(account.identifier, 10000, 250, delayed=True)
 for follower in followers['accounts']:
-    f = open(os.path.join(exportDir, 'followers_raw.txt'), 'a')
+    f = open(join_path('followers_raw.txt'), 'a')
     f.write(str(follower))
     f.close()
 if args.quiet == False:
     print('Followers fetched')
+splitter(join_path('followers_raw.txt'), join_path('followers.txt'), 'Username: ')
 
 sleep(2)
 
@@ -97,31 +108,23 @@ following = []
 sleep(1)
 following = instagram.get_following(account.identifier, 10000, 250, delayed=True)
 for following_user in following['accounts']:
-    f = open(os.path.join(exportDir, 'following_raw.txt'), 'a')
+    f = open(join_path('following_raw.txt'), 'a')
     f.write(str(following_user))
     f.close()
 if args.quiet == False:
     print('Following users fetched')
+splitter(join_path('following_raw.txt'), join_path('following.txt'), 'Username: ')
 
-f = open('var.tmp', 'w')
-f.write('export exportDir=' + exportDir)
-f.close()
-
-subprocess.run(
-    '''
-        source var.tmp
-        grep "Username: " ${exportDir}/following_raw.txt | sed 's/Username: //g' >> ${exportDir}/following.txt
-        grep "Username: " ${exportDir}/followers_raw.txt | sed 's/Username: //g' >> ${exportDir}/followers.txt
-        grep -xivFf  ${exportDir}/followers.txt ${exportDir}/following.txt > ${exportDir}/not_following_back.txt
-    ''',
-    shell=True, check=True,
-    executable='/bin/bash')
-
-os.remove('var.tmp')
+with open(join_path('followers.txt'), "r") as followers:
+    with open(join_path('following.txt'), "r") as following:
+        for item in set(following).difference(followers):
+            f = open(join_path('not_following_back.txt'), 'a')
+            f.write(item)
+            f.close()
 
 if args.quiet == False:
     print('Finished')
     print('All the files are available in the following directory:')
-    print(os.path.join(os.getcwd(),exportDir))
+    print(os.path.join(os.getcwd(),export_dir))
 
 sys.exit(0)

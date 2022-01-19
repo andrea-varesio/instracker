@@ -36,7 +36,6 @@ Contributions are welcome, feel free to submit issues and/or pull requests.
 - Allow authentication with 2FA enabled (see known issues).
 - Associate usernames with user IDs for better filtering when tracker is complete.
 - Keep track of new unfollowers: keep generating `not_following_back.txt` but also create a `tracker.txt` in the root directory to keep track of new unfollowers.
-- Explore alternative ways instead of running a bash subprocess for `grep` + `sed`.
 - Figure out how to use the cookie (if saved).
 
 ### Known issues
