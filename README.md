@@ -9,7 +9,22 @@ It's a tool that fetches "following" and "followers" and then finds ~and keeps t
 ## How to use it
 Launch `export.py` (ie. `python3 export.py`), then login with your credentials and type the username of the account for which you want to find / ~track~ (soon&trade;) unfollowers.
 
-The script will generate an `Export_***` folder that contains the raw and cleaned lists as well as `not_following_back.txt`.
+The script will generate a folder that contains the raw and cleaned lists as well as `not_following_back.txt`.
+
+Usage:
+```
+export.py [-h] [-u USERNAME] [-p PASSWORD | --password-file PASSWORD_FILE] [-t TARGET | -s] [-q] [--save-cookie]
+```
+
+Short | Argument | Info
+---|---|---
+`-u USERNAME` | `--username USERNAME` | Your username
+`-p PASSWORD` | `--password PASSWORD` | Your password
+/ | `--password-file /PATH/TO/FILE` | Read the password from a file
+`-t TARGET` | `--target TARGET` | Username of the account to analyze
+`-s` | `--self` | Analyze your own account
+`-q` | `--quiet` | Disable the majority of prompts and verbosity
+/ | `--save-cookie` | Save a session cookie
 
 ## Limits
 This script fetches up to 10000 followers (and up to 10000 following), 250 at a time with a random delay between each request. These limits can be edited and the delay can be removed, but beware that, as indicated [upstream](https://github.com/realsirjoe/instagram-scraper), too many requests within a short period of time will result in a 429 error.
@@ -50,3 +65,9 @@ GNU General Public License for more details.
 
 You should have received a [copy of the GNU General Public License](https://github.com/andrea-varesio/instracker/blob/main/LICENSE)
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+<div align="center">
+<a href="https://github.com/andrea-varesio/instracker/">
+  <img src="http://hits.dwyl.com/andrea-varesio/instracker.svg?style=flat-square" alt="Hit count" />
+</a>
+</div>

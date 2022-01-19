@@ -1,5 +1,4 @@
-#!/bin/python
-
+#!/bin/python3
 #https://github.com/andrea-varesio/instagram-unfollowers-finder-tracker
 
 print('\n**************************************************')
@@ -10,40 +9,76 @@ print('This is free software, and you are welcome to redistribute it under certa
 print('Full license available at https://github.com/andrea-varesio/instracker')
 print('**************************************************\n\n')
 
-import sys
+import argparse
+import getpass
 import os
 import subprocess
-
-from igramscraper.instagram import Instagram
+import sys
 from datetime import datetime
+from igramscraper.instagram import Instagram
 from time import sleep
-import getpass
 
+def parser():
+    parser = argparse.ArgumentParser()
+    passgroup = parser.add_mutually_exclusive_group()
+    targetgroup = parser.add_mutually_exclusive_group()
+    parser.add_argument('-u', '--username', help='Your username', type=str)
+    passgroup.add_argument('-p', '--password', help='Your password', type=str)
+    passgroup.add_argument('--password-file', help='Read the password from a file', type=str)
+    targetgroup.add_argument('-t', '--target', help='Username of the account to analyze', type=str)
+    targetgroup.add_argument('-s', '--self', help='Analyze your own account', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Disable the majority of prompts and verbosity', action='store_true')
+    parser.add_argument('--save-cookie', help='Save a session cookie', action='store_true')
+    return parser.parse_args()
+
+args = parser()
 instagram = Instagram()
 
-username = input('Enter your username: ')
-password = getpass.getpass('Enter your password: ')
-target = input('Enter the username of the account to analyze (leave blank for "' + username + '"): ')
-if not target:
+if args.username != None:
+    username = args.username
+else:
+    username = input('Enter your username: ')
+
+if args.password == None and args.password_file == None:
+    password = getpass.getpass('Enter your password: ')
+elif args.password != None:
+    password = args.password
+elif os.path.isfile(args.password_file):
+    f = open(args.password_file,'r')
+    password = str(f.readlines()[0])
+    f.close()
+else:
+    if args.quiet == False:
+        print('Invalid file')
+    sys.exit(1)
+
+if args.self:
     target = username
-saveCookie = input('Do you want to save a session cookie? y/n ')
+elif args.target != None:
+    target = args.target
+else:
+    target = input(f'Enter the username of the account to analyze (leave blank for {username}): ')
+    if not target:
+        target = username
 
 instagram.with_credentials(username, password)
 instagram.login(force=False,two_step_verificator=False)
 
 password = None; del password
-if saveCookie != 'y':
+
+if agrs.save_cookie == False:
     Instagram.instance_cache.empty_saved_cookies()
 
 now = datetime.now()
-exportDir = ('Export_' + now.strftime('%Y%m%d%H%M%S'))
+exportDir = (target + now.strftime('_%Y%m%d%H%M%S'))
 os.mkdir(exportDir)
 
 sleep(2)
 
 account = instagram.get_account(target)
 
-print('Fetching followers. This may take a while ...')
+if args.quiet == False:
+    print('Fetching followers. This may take a while ...')
 followers = []
 sleep(1)
 followers = instagram.get_followers(account.identifier, 10000, 250, delayed=True)
@@ -51,11 +86,13 @@ for follower in followers['accounts']:
     f = open(os.path.join(exportDir, 'followers_raw.txt'), 'a')
     f.write(str(follower))
     f.close()
-print('Followers fetched')
+if args.quiet == False:
+    print('Followers fetched')
 
 sleep(2)
 
-print('Fetching following users. This may take a while ...')
+if args.quiet == False:
+    print('Fetching following users. This may take a while ...')
 following = []
 sleep(1)
 following = instagram.get_following(account.identifier, 10000, 250, delayed=True)
@@ -63,7 +100,8 @@ for following_user in following['accounts']:
     f = open(os.path.join(exportDir, 'following_raw.txt'), 'a')
     f.write(str(following_user))
     f.close()
-print('Following users fetched')
+if args.quiet == False:
+    print('Following users fetched')
 
 f = open('var.tmp', 'w')
 f.write('export exportDir=' + exportDir)
@@ -81,8 +119,9 @@ subprocess.run(
 
 os.remove('var.tmp')
 
-print('Finished')
-print('All the files are available in the following directory:')
-print(os.path.join(os.getcwd(),exportDir))
+if args.quiet == False:
+    print('Finished')
+    print('All the files are available in the following directory:')
+    print(os.path.join(os.getcwd(),exportDir))
 
 sys.exit(0)
