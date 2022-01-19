@@ -66,7 +66,7 @@ instagram.login(force=False,two_step_verificator=False)
 
 password = None; del password
 
-if agrs.save_cookie == False:
+if args.save_cookie == False:
     Instagram.instance_cache.empty_saved_cookies()
 
 now = datetime.now()
