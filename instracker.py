@@ -32,12 +32,10 @@ def parser():
     return parser.parse_args()
 
 def splitter(file_input, file_output, query):
-    with open(file_input, 'r') as file:
-        for line in file:
+    with open(file_input, 'r') as file_input, open(file_output, 'a') as file_output:
+        for line in file_input:
             if query in line:
-                f = open(file_output, 'a')
-                f.write(line.split(query)[1])
-                f.close()
+                file_output.write(line.split(query)[1])
 
 def join_path(file):
     return os.path.join(export_dir, file)
@@ -59,6 +57,7 @@ if args.password == None and args.password_file == None:
     password = getpass.getpass('Enter your password: ')
 elif args.password != None:
     password = args.password
+    args.password = None; del args.password
 elif os.path.isfile(args.password_file):
     f = open(args.password_file,'r')
     password = str(f.readlines()[0])
@@ -104,10 +103,9 @@ if args.quiet == False:
 followers = []
 sleep(1)
 followers = instagram.get_followers(account.identifier, 10000, 250, delayed=True)
-for follower in followers['accounts']:
-    f = open(join_path('followers_raw.txt'), 'a')
-    f.write(str(follower))
-    f.close()
+with open(join_path('followers_raw.txt'), 'a') as followers_raw:
+    for follower in followers['accounts']:
+        followers_raw.write(str(follower))
 if args.quiet == False:
     print('Followers fetched')
 splitter(join_path('followers_raw.txt'), join_path('followers.txt'), 'Username: ')
@@ -119,28 +117,21 @@ if args.quiet == False:
 following = []
 sleep(1)
 following = instagram.get_following(account.identifier, 10000, 250, delayed=True)
-for following_user in following['accounts']:
-    f = open(join_path('following_raw.txt'), 'a')
-    f.write(str(following_user))
-    f.close()
+with open(join_path('following_raw.txt'), 'a') as following_raw:
+    for following_user in following['accounts']:
+        following_raw.write(str(following_user))
 if args.quiet == False:
     print('Following users fetched')
 splitter(join_path('following_raw.txt'), join_path('following.txt'), 'Username: ')
 
-with open(join_path('followers.txt'), "r") as followers:
-    with open(join_path('following.txt'), "r") as following:
-        for item in set(following).difference(followers):
-            f = open(join_path('not_following_back.txt'), 'a')
-            f.write(item)
-            f.close()
+with open(join_path('followers.txt'), 'r') as followers, open(join_path('following.txt'), 'r') as following, open(join_path('not_following_back.txt'), 'a') as not_following_back:
+    for item in set(following).difference(followers):
+        not_following_back.write(item)
 
 if dirlist:
-    with open(os.path.join(f'{target}_{max(dirlist)}', 'not_following_back.txt'), "r") as old_unfollowers:
-        with open(join_path('not_following_back.txt'), "r") as new_unfollowers:
-            for item in set(new_unfollowers).difference(old_unfollowers):
-                f = open(join_path('new_unfollowers.txt'), 'a')
-                f.write(item)
-                f.close()
+    with open(os.path.join(f'{target}_{max(dirlist)}', 'not_following_back.txt'), 'r') as old_not_following_back, open(join_path('not_following_back.txt'), 'r') as not_following_back, open(join_path('new_unfollowers.txt'), 'a') as new_unfollowers:
+        for item in set(not_following_back).difference(old_not_following_back):
+            new_unfollowers.write(item)
 
 if args.quiet == False:
     print('Finished')
