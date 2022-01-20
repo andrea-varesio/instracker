@@ -11,6 +11,7 @@ print('**************************************************\n\n')
 
 import argparse
 import getpass
+import glob
 import os
 import sys
 from datetime import datetime
@@ -40,6 +41,11 @@ def splitter(file_input, file_output, query):
 
 def join_path(file):
     return os.path.join(export_dir, file)
+
+def find(filename, path):
+  for root, dirs, files in os.walk(path):
+    if filename in files:
+      yield root
 
 args = parser()
 instagram = Instagram()
@@ -78,6 +84,12 @@ password = None; del password
 
 if args.save_cookie == False:
     Instagram.instance_cache.empty_saved_cookies()
+
+dirlist = []
+for result in glob.iglob(f'{target}_*'):
+    if os.path.isdir(result):
+        for dirname in find('not_following_back.txt', result):
+            dirlist.append(int(dirname.split(f'{target}_')[1]))
 
 now = datetime.now()
 export_dir = (target + now.strftime('_%Y%m%d%H%M%S'))
@@ -121,6 +133,14 @@ with open(join_path('followers.txt'), "r") as followers:
             f = open(join_path('not_following_back.txt'), 'a')
             f.write(item)
             f.close()
+
+if dirlist:
+    with open(os.path.join(f'{target}_{max(dirlist)}', 'not_following_back.txt'), "r") as old_unfollowers:
+        with open(join_path('not_following_back.txt'), "r") as new_unfollowers:
+            for item in set(new_unfollowers).difference(old_unfollowers):
+                f = open(join_path('new_unfollowers.txt'), 'a')
+                f.write(item)
+                f.close()
 
 if args.quiet == False:
     print('Finished')

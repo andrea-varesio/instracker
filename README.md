@@ -1,19 +1,19 @@
 # Instracker: Instagram unfollowers finder/tracker
 
 ## What is it
-It's a tool that fetches "following" and "followers" and then finds ~and keeps track of~ (soon&trade;) the usernames of the accounts that are not following you back.
+It's a tool that fetches "following" and "followers" and then finds and keeps track of the usernames of the accounts that are not following you back and the new unfollowers.
 
 ## Requirements
 `pip install -r requirements.txt`
 
 ## How to use it
-Launch `export.py` (ie. `python3 export.py`), then login with your credentials and type the username of the account for which you want to find / ~track~ (soon&trade;) unfollowers.
+Launch `instracker.py` (ie. `python3 instracker.py`), then login with your credentials and type the username of the account for which you want to find / track new unfollowers.
 
-The script will generate a folder that contains the raw and cleaned lists as well as `not_following_back.txt`.
+The script will generate a folder that contains the raw and cleaned lists as well as `not_following_back.txt` and `new_unfollowers.txt`.
 
 Usage:
 ```
-export.py [-h] [-u USERNAME] [-p PASSWORD | --password-file PASSWORD_FILE] [-t TARGET | -s] [-q] [--save-cookie]
+instracker.py [-h] [-u USERNAME] [-p PASSWORD | --password-file PASSWORD_FILE] [-t TARGET | -s] [-q] [--save-cookie]
 ```
 
 Short | Argument | Info
@@ -34,8 +34,7 @@ Contributions are welcome, feel free to submit issues and/or pull requests.
 
 ### To-Do
 - Allow authentication with 2FA enabled (see known issues).
-- Associate usernames with user IDs for better filtering when tracker is complete.
-- Keep track of new unfollowers: keep generating `not_following_back.txt` but also create a `tracker.txt` in the root directory to keep track of new unfollowers.
+- Associate usernames with user IDs for better filtering.
 - Figure out how to use the cookie (if saved).
 
 ### Known issues
