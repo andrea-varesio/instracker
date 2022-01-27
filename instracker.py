@@ -1,5 +1,5 @@
 #!/bin/python3
-#https://github.com/andrea-varesio/instagram-unfollowers-finder-tracker
+#https://github.com/andrea-varesio/instracker
 
 import argparse
 import getpass
@@ -11,7 +11,6 @@ from time import sleep
 
 from igramscraper.instagram import Instagram
 
-
 def show_license():
     print('\n**************************************************')
     print('"Instracker: Instagram unfollowers finder/tracker" - Find and keep track of who unfollows you on Instagram.')
@@ -22,6 +21,7 @@ def show_license():
     print('**************************************************\n\n')
 
 def parser():
+    show_license()
     parser = argparse.ArgumentParser()
     passgroup = parser.add_mutually_exclusive_group()
     targetgroup = parser.add_mutually_exclusive_group()
@@ -50,8 +50,6 @@ def find(filename, path):
 
 args = parser()
 instagram = Instagram()
-
-show_license()
 
 if args.username is not None:
     username = args.username
