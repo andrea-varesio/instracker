@@ -1,22 +1,25 @@
 #!/bin/python3
 #https://github.com/andrea-varesio/instagram-unfollowers-finder-tracker
 
-print('\n**************************************************')
-print('"Instracker: Instagram unfollowers finder/tracker" - Find and keep track of who unfollows you on Instagram.')
-print('Copyright (C) 2022 Andrea Varesio (https://www.andreavaresio.com/).')
-print('This program comes with ABSOLUTELY NO WARRANTY')
-print('This is free software, and you are welcome to redistribute it under certain conditions')
-print('Full license available at https://github.com/andrea-varesio/instracker')
-print('**************************************************\n\n')
-
 import argparse
 import getpass
 import glob
 import os
 import sys
 from datetime import datetime
-from igramscraper.instagram import Instagram
 from time import sleep
+
+from igramscraper.instagram import Instagram
+
+
+def show_license():
+    print('\n**************************************************')
+    print('"Instracker: Instagram unfollowers finder/tracker" - Find and keep track of who unfollows you on Instagram.')
+    print('Copyright (C) 2022 Andrea Varesio (https://www.andreavaresio.com/).')
+    print('This program comes with ABSOLUTELY NO WARRANTY')
+    print('This is free software, and you are welcome to redistribute it under certain conditions')
+    print('Full license available at https://github.com/andrea-varesio/instracker')
+    print('**************************************************\n\n')
 
 def parser():
     parser = argparse.ArgumentParser()
@@ -41,35 +44,37 @@ def join_path(file):
     return os.path.join(export_dir, file)
 
 def find(filename, path):
-  for root, dirs, files in os.walk(path):
-    if filename in files:
-      yield root
+    for root, dirs, files in os.walk(path):
+        if filename in files:
+            yield root
 
 args = parser()
 instagram = Instagram()
 
-if args.username != None:
+show_license()
+
+if args.username is not None:
     username = args.username
 else:
     username = input('Enter your username: ')
 
-if args.password == None and args.password_file == None:
+if args.password is None and args.password_file is None:
     password = getpass.getpass('Enter your password: ')
-elif args.password != None:
+elif args.password is not None:
     password = args.password
-    args.password = None; del args.password
+    args.password = None
+    del args.password
 elif os.path.isfile(args.password_file):
-    f = open(args.password_file,'r')
-    password = str(f.readlines()[0])
-    f.close()
+    with open(args.password_file,'r') as f:
+        password = str(f.readlines()[0])
 else:
-    if args.quiet == False:
+    if not args.quiet:
         print('Invalid file')
     sys.exit(1)
 
 if args.self:
     target = username
-elif args.target != None:
+elif args.target is not None:
     target = args.target
 else:
     target = input(f'Enter the username of the account to analyze (leave blank for {username}): ')
@@ -79,9 +84,10 @@ else:
 instagram.with_credentials(username, password)
 instagram.login(force=False,two_step_verificator=False)
 
-password = None; del password
+password = None
+del password
 
-if args.save_cookie == False:
+if not args.save_cookie:
     Instagram.instance_cache.empty_saved_cookies()
 
 dirlist = []
@@ -98,7 +104,7 @@ sleep(2)
 
 account = instagram.get_account(target)
 
-if args.quiet == False:
+if not args.quiet:
     print('Fetching followers. This may take a while ...')
 followers = []
 sleep(1)
@@ -106,13 +112,13 @@ followers = instagram.get_followers(account.identifier, 10000, 250, delayed=True
 with open(join_path('followers_raw.txt'), 'a') as followers_raw:
     for follower in followers['accounts']:
         followers_raw.write(str(follower))
-if args.quiet == False:
+if not args.quiet:
     print('Followers fetched')
 splitter(join_path('followers_raw.txt'), join_path('followers.txt'), 'Username: ')
 
 sleep(2)
 
-if args.quiet == False:
+if not args.quiet:
     print('Fetching following users. This may take a while ...')
 following = []
 sleep(1)
@@ -120,7 +126,7 @@ following = instagram.get_following(account.identifier, 10000, 250, delayed=True
 with open(join_path('following_raw.txt'), 'a') as following_raw:
     for following_user in following['accounts']:
         following_raw.write(str(following_user))
-if args.quiet == False:
+if not args.quiet:
     print('Following users fetched')
 splitter(join_path('following_raw.txt'), join_path('following.txt'), 'Username: ')
 
@@ -133,7 +139,7 @@ if dirlist:
         for item in set(not_following_back).difference(old_not_following_back):
             new_unfollowers.write(item)
 
-if args.quiet == False:
+if not args.quiet:
     print('Finished')
     print('All the files are available in the following directory:')
     print(os.path.join(os.getcwd(),export_dir))
