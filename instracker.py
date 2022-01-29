@@ -13,14 +13,15 @@ from igramscraper.instagram import Instagram
 
 def show_license():
     print('\n**************************************************')
-    print('"Instracker: Instagram unfollowers finder/tracker" - Find and keep track of who unfollows you on Instagram.')
+    print('"Instracker: Instagram unfollowers finder/tracker" - \
+            Find and keep track of who unfollows you on Instagram.')
     print('Copyright (C) 2022 Andrea Varesio (https://www.andreavaresio.com/).')
     print('This program comes with ABSOLUTELY NO WARRANTY')
     print('This is free software, and you are welcome to redistribute it under certain conditions')
     print('Full license available at https://github.com/andrea-varesio/instracker')
     print('**************************************************\n\n')
 
-def parser():
+def parse_arguments():
     show_license()
     parser = argparse.ArgumentParser()
     passgroup = parser.add_mutually_exclusive_group()
@@ -30,15 +31,18 @@ def parser():
     passgroup.add_argument('--password-file', help='Read the password from a file', type=str)
     targetgroup.add_argument('-t', '--target', help='Username of the account to analyze', type=str)
     targetgroup.add_argument('-s', '--self', help='Analyze your own account', action='store_true')
-    parser.add_argument('-q', '--quiet', help='Disable the majority of prompts and verbosity', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Disable unnecessary prompts', action='store_true')
     parser.add_argument('--save-cookie', help='Save a session cookie', action='store_true')
     return parser.parse_args()
 
 def splitter(file_input, file_output, query):
-    with open(file_input, 'r') as file_input, open(file_output, 'a') as file_output:
-        for line in file_input:
+    with (
+        open(file_input, 'r', encoding='utf-8') as file_input_data,
+        open(file_output, 'a', encoding='utf-8') as file_output_data
+    ):
+        for line in file_input_data:
             if query in line:
-                file_output.write(line.split(query)[1])
+                file_output_data.write(line.split(query)[1])
 
 def join_path(file):
     return os.path.join(export_dir, file)
@@ -48,7 +52,7 @@ def find(filename, path):
         if filename in files:
             yield root
 
-args = parser()
+args = parse_arguments()
 instagram = Instagram()
 
 if args.username is not None:
@@ -63,8 +67,8 @@ elif args.password is not None:
     args.password = None
     del args.password
 elif os.path.isfile(args.password_file):
-    with open(args.password_file,'r') as f:
-        password = str(f.readlines()[0])
+    with open(args.password_file, 'r', encoding='utf-8') as password_file:
+        PASSWORD = str(password_file.readlines()[0])
 else:
     if not args.quiet:
         print('Invalid file')
@@ -82,8 +86,8 @@ else:
 instagram.with_credentials(username, password)
 instagram.login(force=False,two_step_verificator=False)
 
-password = None
-del password
+PASSWORD = None
+del PASSWORD
 
 if not args.save_cookie:
     Instagram.instance_cache.empty_saved_cookies()
@@ -107,7 +111,7 @@ if not args.quiet:
 followers = []
 sleep(1)
 followers = instagram.get_followers(account.identifier, 10000, 250, delayed=True)
-with open(join_path('followers_raw.txt'), 'a') as followers_raw:
+with open(join_path('followers_raw.txt'), 'a', encoding='utf-8') as followers_raw:
     for follower in followers['accounts']:
         followers_raw.write(str(follower))
 if not args.quiet:
@@ -121,19 +125,31 @@ if not args.quiet:
 following = []
 sleep(1)
 following = instagram.get_following(account.identifier, 10000, 250, delayed=True)
-with open(join_path('following_raw.txt'), 'a') as following_raw:
+with open(join_path('following_raw.txt'), 'a', encoding='utf-8') as following_raw:
     for following_user in following['accounts']:
         following_raw.write(str(following_user))
 if not args.quiet:
     print('Following users fetched')
 splitter(join_path('following_raw.txt'), join_path('following.txt'), 'Username: ')
 
-with open(join_path('followers.txt'), 'r') as followers, open(join_path('following.txt'), 'r') as following, open(join_path('not_following_back.txt'), 'a') as not_following_back:
+with (
+    open(join_path('followers.txt'), 'r', encoding='utf-8') as followers,
+    open(join_path('following.txt'), 'r', encoding='utf-8') as following,
+    open(join_path('not_following_back.txt'), 'a', encoding='utf-8') as not_following_back
+):
     for item in set(following).difference(followers):
         not_following_back.write(item)
 
 if dirlist:
-    with open(os.path.join(f'{target}_{max(dirlist)}', 'not_following_back.txt'), 'r') as old_not_following_back, open(join_path('not_following_back.txt'), 'r') as not_following_back, open(join_path('new_unfollowers.txt'), 'a') as new_unfollowers:
+    with (
+        open(os.path.join(
+            f'{target}_{max(dirlist)}',
+            'not_following_back.txt'),
+            'r', encoding='utf-8'
+        ) as old_not_following_back,
+        open(join_path('not_following_back.txt'), 'r', encoding='utf-8') as not_following_back,
+        open(join_path('new_unfollowers.txt'), 'a', encoding='utf-8') as new_unfollowers
+    ):
         for item in set(not_following_back).difference(old_not_following_back):
             new_unfollowers.write(item)
 
