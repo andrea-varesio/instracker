@@ -61,9 +61,9 @@ else:
     username = input('Enter your username: ')
 
 if args.password is None and args.password_file is None:
-    password = getpass.getpass('Enter your password: ')
+    PASSWORD = getpass.getpass('Enter your password: ')
 elif args.password is not None:
-    password = args.password
+    PASSWORD = args.password
     args.password = None
     del args.password
 elif os.path.isfile(args.password_file):
@@ -83,7 +83,7 @@ else:
     if not target:
         target = username
 
-instagram.with_credentials(username, password)
+instagram.with_credentials(username, PASSWORD)
 instagram.login(force=False,two_step_verificator=False)
 
 PASSWORD = None
