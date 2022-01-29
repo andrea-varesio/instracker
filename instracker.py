@@ -13,8 +13,8 @@ from igramscraper.instagram import Instagram
 
 def show_license():
     print('\n**************************************************')
-    print('"Instracker: Instagram unfollowers finder/tracker" - \
-            Find and keep track of who unfollows you on Instagram.')
+    print('"Instracker: Instagram unfollowers finder/tracker"')
+    print('Find and keep track of who unfollows you on Instagram.')
     print('Copyright (C) 2022 Andrea Varesio (https://www.andreavaresio.com/).')
     print('This program comes with ABSOLUTELY NO WARRANTY')
     print('This is free software, and you are welcome to redistribute it under certain conditions')
