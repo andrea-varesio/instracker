@@ -4,8 +4,8 @@
 '''Find and keep track of who unfollows you on Instagram'''
 
 import argparse
-import getpass
 import datetime
+import getpass
 import glob
 import os
 import pathlib
