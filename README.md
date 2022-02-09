@@ -15,7 +15,7 @@ The script will generate a folder in your `$HOME` directory (unless you specify 
 
 Usage:
 ```
-instracker.py [-h] [-u USERNAME] [-p PASSWORD | --password-file PASSWORD_FILE] [-t TARGET] [--save-cookie] [-q] [-o OUTPUT]
+instracker.py [-h] [-u USERNAME] [-p PASSWORD | --password-file PASSWORD_FILE] [-t TARGET] [--save-cookie] [-q] [-o OUTPUT] [-kr] [-kc]
 ```
 
 Short | Argument | Info
@@ -28,6 +28,8 @@ Short | Argument | Info
 / | `--save-cookie` | Save a session cookie
 `-q` | `--quiet` | Disable verbosity
 `-o OUTPUT` | `--output OUTPUT` | Specify output directory
+`-kr` | `--keep-raw` | Keep raw files
+`-kc` | `--keep-clean` | Keep clean files
 
 ## Limits
 This script fetches up to 10000 followers (and up to 10000 following), 250 at a time with a random delay between each request. These limits can be edited and the delay can be removed, but beware that, as indicated [upstream](https://github.com/realsirjoe/instagram-scraper), too many requests within a short period of time will result in a 429 error.

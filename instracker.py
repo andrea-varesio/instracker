@@ -41,6 +41,8 @@ def parse_arguments():
     arg_parser.add_argument('--save-cookie', help='Save a session cookie', action='store_true')
     arg_parser.add_argument('-q', '--quiet', help='Disable verbosity', action='store_true')
     arg_parser.add_argument('-o', '--output', help='Specify output directory', type=str)
+    arg_parser.add_argument('-kr', '--keep-raw', help='Keep raw files', action='store_true')
+    arg_parser.add_argument('-kc', '--keep-clean', help='Keep clean lists', action='store_true')
 
     return arg_parser.parse_args()
 
@@ -72,10 +74,10 @@ def get_output_dir():
     target = get_target()
 
     if not args.output:
-        return os.path.join(pathlib.Path.home(), f'Instracker_{target}_{now}')
+        return os.path.join(pathlib.Path.home(), 'Instracker_output', f'Instracker_{target}_{now}')
 
     if os.path.isdir(args.output):
-        return os.path.join(args.output, f'Instracker_{target}_{now}')
+        return os.path.join(args.output, 'Instracker_output', f'Instracker_{target}_{now}')
 
     return print_exit('Invalid output path', 1)
 
@@ -157,6 +159,10 @@ def extract_list(filename):
             if query in line:
                 file_output_data.write(line.split(query)[1])
 
+    args = parse_arguments()
+    if not args.keep_raw:
+        os.remove(file_input)
+
 def get_not_following_back():
     '''Save list of people not following back to not_following_back.txt'''
 
@@ -170,14 +176,18 @@ def get_not_following_back():
         for user in set(following).difference(followers):
             nfb.write(user)
 
+    args = parse_arguments()
+    if not args.keep_clean:
+        os.remove(os.path.join(output_dir, 'followers.txt'))
+        os.remove(os.path.join(output_dir, 'following.txt'))
+
 def get_new_unfollowers():
     '''Find new unfollowers if a previous file exists and save list to new_unfollowers.txt'''
 
     output_dir = get_output_dir()
 
     def find(filename, path):
-        for root, dirs, files in os.walk(path):
-            del dirs
+        for root, _, files in os.walk(path):
             if filename in files and root != output_dir:
                 yield root
 
@@ -211,7 +221,7 @@ def main():
         print_exit('Missing username', 1)
 
     if not os.path.isdir(output_dir):
-        os.mkdir(output_dir)
+        os.makedirs(output_dir)
 
     if not args.quiet:
         show_license()
