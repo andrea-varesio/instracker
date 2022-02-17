@@ -77,7 +77,13 @@ def get_output_dir():
         return os.path.join(pathlib.Path.home(), 'Instracker_output', f'Instracker_{target}_{now}')
 
     if os.path.isdir(args.output):
-        return os.path.join(args.output, 'Instracker_output', f'Instracker_{target}_{now}')
+        if args.output.startswith('./'):
+            output_dir_root = os.path.join(os.getcwd(), args.output.replace('./', '', 1))
+        elif args.output == '.':
+            output_dir_root = args.output.replace('.', os.getcwd())
+        else:
+            output_dir_root = args.output
+        return os.path.join(output_dir_root, 'Instracker_output', f'Instracker_{target}_{now}')
 
     return print_exit('Invalid output path', 1)
 
@@ -200,11 +206,11 @@ def get_new_unfollowers():
                 dirlist.append(int(dirname.split(f'{root_dir}')[1]))
 
     if dirlist:
-        old_nfb_path = os.path.join(f'{root_dir}{max(dirlist)}','not_following_back.txt')
+        old_nfb_path = os.path.join(f'{root_dir}{max(dirlist)}', 'not_following_back.txt')
         nfb_path = os.path.join(output_dir, 'not_following_back.txt')
         new_unfollowers_path = os.path.join(output_dir, 'new_unfollowers.txt')
         with (
-            open(old_nfb_path,'r', encoding='utf-8') as old_nfb,
+            open(old_nfb_path, 'r', encoding='utf-8') as old_nfb,
             open(nfb_path, 'r', encoding='utf-8') as nfb,
             open(new_unfollowers_path, 'a', encoding='utf-8') as new_unfollowers
         ):
