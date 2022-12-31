@@ -1,3 +1,7 @@
+# ⚠️ WARNING ⚠️
+
+Since the [instagram_scraper](https://github.com/realsirjoe/instagram-scraper) dependency is no longer being developed, this repository will be archived.
+
 # Instracker: Instagram unfollowers finder/tracker
 
 ## What is it
